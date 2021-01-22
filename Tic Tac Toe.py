@@ -1,7 +1,7 @@
-import math
-import random
-import time
-import datetime
+from math import floor
+from random import choice
+from time import time
+from datetime import timedelta
 
 DEV_MODE = False
 
@@ -55,7 +55,7 @@ class Gameplay:
 				print("Error: Position unavailable.")
 				self.draw(input("Your move: "), symbol)
 			else:
-				row = math.floor((position - 1) / 3)
+				row = floor((position - 1) / 3)
 				column = position - 1 - row * 3
 				self.board[row][column] = symbol
 				self.stats.options.remove(position)
@@ -88,13 +88,13 @@ class Gameplay:
 		if progressVisible: print("Score:", self.stats.score["player"], "VS", self.stats.score["computer"])
 		if isAutoplay:
 			autoplay.round += 1
-			if time.time() - autoplay.timeSinceLastUpdate >= 5:
-				delta = time.time() - autoplay.startTime
+			if time() - autoplay.timeSinceLastUpdate >= 5 and not progressVisible:
+				delta = time() - autoplay.startTime
 				estTime = (float(autoplay.limit) / autoplay.round) * delta
-				remaining = autoplay.startTime + estTime - time.time()
-				print("Estimated Total Time:", datetime.timedelta(seconds = estTime))
-				print("Time Left:", datetime.timedelta(seconds = remaining), "\n")
-				autoplay.timeSinceLastUpdate = time.time()
+				remaining = autoplay.startTime + estTime - time()
+				print("Estimated Total Time:", timedelta(seconds = estTime))
+				print("Time Left:", timedelta(seconds = remaining), "\n")
+				autoplay.timeSinceLastUpdate = time()
 		else:
 			print("Type 'r' to retry.")
 	
@@ -138,7 +138,7 @@ class Computer:
 
 	def move(self):
 		self.insertNewCell()
-		selection = random.choice(self.cells[self.history])
+		selection = choice(self.cells[self.history])
 		if progressVisible: print("Computer's move:", selection)
 		game.draw(selection, "O")
 
@@ -149,13 +149,13 @@ def autoplay(iterations: int, showProgress: bool):
 	if not isAutoplay:
 		autoplay.limit = iterations
 		autoplay.round = 0
-		autoplay.startTime = time.time()
-		autoplay.timeSinceLastUpdate = time.time() - 5
-		game.draw(random.choice(game.stats.options), "X")
+		autoplay.startTime = time()
+		autoplay.timeSinceLastUpdate = time() - 5
+		game.draw(choice(game.stats.options), "X")
 	
 	isAutoplay = autoplay.round < iterations
 	progressVisible = showProgress if autoplay.round < iterations else True
-	if autoplay.round >= iterations: print("Autoplay finished after", iterations, "games in", time.time() - autoplay.startTime, "seconds.\n")
+	if autoplay.round >= iterations: print("Autoplay finished after", iterations, "games in", time() - autoplay.startTime, "seconds.\n")
 
 game = Gameplay()
 comp = Computer()
@@ -166,7 +166,7 @@ while True:
 	try:
 		if game.stats.playerTurn:
 			if progressVisible: print("Options:", str(game.stats.options))
-			playerMove = random.choice(game.stats.options) if isAutoplay else input("Your move: ")
+			playerMove = choice(game.stats.options) if isAutoplay else input("Your move: ")
 			game.draw(playerMove, "X")
 		else:
 			comp.move()
