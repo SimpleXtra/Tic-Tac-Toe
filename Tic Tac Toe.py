@@ -193,14 +193,16 @@ while True:
 			else:
 				quit()
 		game.stats.changeTurn(game.stats)
-	except Exception as e:
-		print("Something went wrong. Error:", e)
-		print("BACKUP DATA")
-		print("Moves History on last game:", comp.history)
-		print("Last board situation:")
-		game.printBoard()
-		print("Computer's dictionary based on last history:", comp.cells.get(comp.history))
-		if input("Print full dictionary?") == "Yes":
-			print("Computer's full dictionary:", comp.cells, sep = "\n")
+	except Exception as error:
+		print("Something went wrong. Error:", error)
+		if input("Print backup data? (Yes/No)").lower() == "yes":
+			print("BACKUP DATA")
+			print("Moves history on last game:", comp.history)
+			print("Last board situation:")
+			game.printBoard()
+			print("Computer's dictionary based on last history:", comp.cells.get(comp.history))
+			if input("Print full dictionary? (Yes/No)").lower() == "yes":
+				print("Computer's full dictionary:", comp.cells, sep = "\n")
 		print("Session ended.")
+		input("Press enter/return to close the application.")
 		quit()
