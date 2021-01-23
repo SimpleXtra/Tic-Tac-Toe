@@ -12,9 +12,12 @@ class Gameplay:
 	
 	def printBoard(self):
 		for row in self.board:
-			print(*row, sep = " | ")
-			if row is not self.board[2]:
-				print("-"*9)
+			if row is self.board[0]: print("\u2584"*23)
+			print(("\u2588"*2 + "\u2580"*5)*3 + "\u2588"*2)
+			print("\u2588"*2, end = "  ")
+			print(*row, sep = "  \u2588\u2588  ", end = "  \u2588\u2588\n")
+			print(("\u2588"*2 + "\u2584"*5)*3 + "\u2588"*2)
+			if row is self.board[2]: print("\u2580"*23)
 	
 	def draw(self, position: int, symbol: str):
 		try:

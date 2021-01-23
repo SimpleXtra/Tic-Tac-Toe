@@ -21,11 +21,17 @@ Your move:
 ```
 Each numbers inside the brackets represents a vacant position in the board. The numbers change as you play the game. The distribution is:
 ```
-1 | 2 | 3
----------
-4 | 5 | 6
----------
-7 | 8 | 9
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+██▀▀▀▀▀██▀▀▀▀▀██▀▀▀▀▀██
+██  1  ██  2  ██  3  ██
+██▄▄▄▄▄██▄▄▄▄▄██▄▄▄▄▄██
+██▀▀▀▀▀██▀▀▀▀▀██▀▀▀▀▀██
+██  4  ██  5  ██  6  ██
+██▄▄▄▄▄██▄▄▄▄▄██▄▄▄▄▄██
+██▀▀▀▀▀██▀▀▀▀▀██▀▀▀▀▀██
+██  7  ██  8  ██  9  ██
+██▄▄▄▄▄██▄▄▄▄▄██▄▄▄▄▄██
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 ```
 Type the number location where you want to mark your symbol when prompted with `Your move: `. After that, the computer will automatically make his move. This goes on until either someone wins the game or the board is full and results in a draw.
 
