@@ -1,7 +1,6 @@
 from math import floor
 from random import choice
-from time import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 DEV_MODE = False
 
@@ -91,13 +90,13 @@ class Gameplay:
 		if progressVisible: print("Score:", self.stats.score["player"], "VS", self.stats.score["computer"])
 		if isAutoplay:
 			autoplay.round += 1
-			if time() - autoplay.timeSinceLastUpdate >= 5 and not progressVisible:
-				delta = time() - autoplay.startTime
-				estTime = (float(autoplay.limit) / autoplay.round) * delta
-				remaining = autoplay.startTime + estTime - time()
-				print("Estimated Total Time:", timedelta(seconds = estTime))
-				print("Time Left:", timedelta(seconds = remaining), "\n")
-				autoplay.timeSinceLastUpdate = time()
+			if datetime.now() - autoplay.timeSinceLastUpdate >= timedelta(seconds = 5) and not progressVisible:
+				delta = datetime.now() - autoplay.startTime
+				estTime = datetime.fromtimestamp(float(autoplay.limit / autoplay.round) * delta.total_seconds())
+				remaining = estTime - datetime.now() + autoplay.startTime
+				print("Estimated Total Time:", estTime.strftime("%M:%S.%f")[:-4])
+				print("Time Left:", remaining.strftime("%M:%S.%f")[:-4], "\n")
+				autoplay.timeSinceLastUpdate = datetime.now()
 		else:
 			print("Type 'r' to retry.")
 	
@@ -152,13 +151,14 @@ def autoplay(iterations: int, showProgress: bool):
 	if not isAutoplay:
 		autoplay.limit = iterations
 		autoplay.round = 0
-		autoplay.startTime = time()
-		autoplay.timeSinceLastUpdate = time() - 5
+		autoplay.startTime = datetime.now()
+		autoplay.timeSinceLastUpdate = datetime.now() - timedelta(seconds = 5)
 		game.draw(choice(game.stats.options), "X")
 	
+	elapsed = datetime.now() - autoplay.startTime + datetime.strptime("00:00:00", "%H:%M:%S")
 	isAutoplay = autoplay.round < iterations
 	progressVisible = showProgress if autoplay.round < iterations else True
-	if autoplay.round >= iterations: print("Autoplay finished after", iterations, "games in", time() - autoplay.startTime, "seconds.\n")
+	if autoplay.round >= iterations: print("Autoplay finished after", iterations, "games in", elapsed.strftime("%M:%S.%f")[:-4], "\n")
 
 game = Gameplay()
 comp = Computer()
