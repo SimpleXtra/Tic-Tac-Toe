@@ -94,8 +94,10 @@ class Gameplay:
 				delta = datetime.now() - autoplay.startTime
 				estTime = datetime.fromtimestamp(float(autoplay.limit / autoplay.round) * delta.total_seconds())
 				remaining = estTime - datetime.now() + autoplay.startTime
+				speed = round(autoplay.round / delta.total_seconds())
 				print("Estimated Total Time:", estTime.strftime("%M:%S.%f")[:-4])
-				print("Time Left:", remaining.strftime("%M:%S.%f")[:-4], "\n")
+				print("Time Left:", remaining.strftime("%M:%S.%f")[:-4])
+				print("Speed:", speed, "games/s\n")
 				autoplay.timeSinceLastUpdate = datetime.now()
 		else:
 			print("Type 'r' to retry.")
