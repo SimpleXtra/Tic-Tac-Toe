@@ -29,6 +29,8 @@ Because the Developer Mode acts similarly to a Python interpreter, it can interp
    - `print()`
    - `len()`
    - `str()`
+   - `quit()`
+
 2. Custom names
    - `ai.cells`
    - `train.autoplay()`

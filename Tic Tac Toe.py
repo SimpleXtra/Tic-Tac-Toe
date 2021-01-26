@@ -30,16 +30,33 @@ class Gameplay:
 				try:
 					if position == "": raise SyntaxError
 					
-					builtinAccess = {"print": print, "len": len, "str": str, "True": True, "False": False}
+					builtinAccess = {"print": print, "len": len, "str": str, "quit": quit, "True": True, "False": False}
 					globalAccess = {"ai": ai, "cells": ai.cells, "train": train, "autoplay": train.autoplay}
 					parse = compile(position, "<string>", "eval")
 					for keyword in parse.co_names:
 						if keyword not in builtinAccess and keyword not in globalAccess:
 							raise NameError(keyword)
 					
-					eval(position, {"__builtins__": builtinAccess}, globalAccess)
+					result = eval(position, {"__builtins__": builtinAccess}, globalAccess)
+					if result is not None: print(result)
 				except NameError as keyword:
-					keywords = list(dir(__builtins__) + dir(globals()) + dir(locals()) + dir(Gameplay) + dir(Computer) + list(globals().keys()) + list(locals().keys()))
+					keywords = list()
+					root = list(globals().keys())
+					gen = 1
+					
+					for globalDir in root: keywords.append(globalDir)
+
+					while gen <= 3:
+						nextGen = list()
+						
+						for directory in root:
+							subdirectories = dir(eval(directory))
+							for subdirectory in subdirectories:
+								keywords.append(subdirectory)
+								nextGen.append(subdirectory)
+						
+						nextGen = root
+						gen += 1
 					
 					if str(keyword) in keywords:
 						print(f"Error: Access blocked to keyword '{keyword}'.")
@@ -49,7 +66,7 @@ class Gameplay:
 					if position == "": print("Error: No input given.")
 					else: print("Error: Invalid syntax.")
 				except Exception as message:
-					print("Error: ", message)
+					print("Error:", message)
 			else:
 				print("Error: Invalid input.")
 			
