@@ -1,6 +1,7 @@
 from math import floor
 from random import choice
 from datetime import datetime, timedelta
+from traceback import print_exc
 
 DEV_MODE = False
 
@@ -223,15 +224,15 @@ while True:
 		
 		game.stats.changeTurn(game.stats)
 	except Exception as error:
-		print("Something went wrong. Error:", error)
+		print_exc()
 		
-		if input("Print backup data? (Yes/No)").lower() == "yes":
-			print("BACKUP DATA")
+		if input("\nPrint backup data? (Yes/No) ").lower() == "yes":
+			print("-"*50 + "\n" + "BACKUP DATA".center(50) + "\n" + "-"*50)
 			print("Moves history on last game:", ai.history)
 			print("Last board situation:")
 			game.printBoard()
 			print("Computer's dictionary based on last history:", ai.cells.get(ai.history))
-			if input("Print full dictionary? (Yes/No)").lower() == "yes":
+			if input("Print full dictionary? (Yes/No) ").lower() == "yes":
 				print("Computer's full dictionary:", ai.cells, sep = "\n")
 		
 		print("Session ended.")
