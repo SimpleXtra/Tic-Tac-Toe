@@ -43,21 +43,21 @@ class Gameplay:
 				except NameError as keyword:
 					keywords = list()
 					root = list(globals().keys())
-					gen = 1
+					level = 1
 					
-					for globalDir in root: keywords.append(globalDir)
+					for globalDirectory in root: keywords.append(globalDirectory)
 
-					while gen <= 3:
-						nextGen = list()
+					while level <= 3:
+						nextLevelDirectories = list()
 						
 						for directory in root:
 							subdirectories = dir(eval(directory))
 							for subdirectory in subdirectories:
 								keywords.append(subdirectory)
-								nextGen.append(subdirectory)
+								nextLevelDirectories.append(subdirectory)
 						
-						nextGen = root
-						gen += 1
+						nextLevelDirectories = root
+						level += 1
 					
 					if str(keyword) in keywords:
 						print(f"Error: Access blocked to keyword '{keyword}'.")
@@ -90,13 +90,13 @@ class Gameplay:
 		diagonalNWSE = list()
 		diagonalSWNE = list()
 
-		for x in range(3):
-			if (len(set(self.board[x])) == 1 and self.board[x][0] != " ") or (self.board[0][x] == self.board[1][x] == self.board[2][x] and self.board[0][x] != " "):
+		for index in range(3):
+			if (len(set(self.board[index])) == 1 and self.board[index][0] != " ") or (self.board[0][index] == self.board[1][index] == self.board[2][index] and self.board[0][index] != " "):
 				return True
 			
-			y = (2, 1, 0)
-			diagonalNWSE.append(self.board[x][x])
-			diagonalSWNE.append(self.board[y[x]][x])
+			inversedRow = (2, 1, 0)
+			diagonalNWSE.append(self.board[index][index])
+			diagonalSWNE.append(self.board[inversedRow[index]][index])
 		
 		return (len(set(diagonalNWSE)) == 1 and diagonalNWSE[0] != " ") or (len(set(diagonalSWNE)) == 1 and diagonalSWNE[0] != " ")
 	
@@ -223,7 +223,7 @@ while True:
 				quit()
 		
 		game.stats.changeTurn(game.stats)
-	except Exception as error:
+	except Exception:
 		print_exc()
 		
 		if input("\nPrint backup data? (Yes/No) ").lower() == "yes":
