@@ -176,8 +176,9 @@ class Computer:
 			if not self.isRunning: print("Autoplay finished after", iterations, "games in", elapsed.strftime("%M:%S.%f")[:-4], "\n")
 		
 		def updateTimeInfo(self):
-			if datetime.now() - self.timeSinceLastUpdate >= timedelta(seconds = 5) and not self.visible:
-				elapsedTime = (datetime.now() - self.startTime).total_seconds()
+			elapsedTime = (datetime.now() - self.startTime).total_seconds()
+			
+			if datetime.now() - self.timeSinceLastUpdate >= timedelta(seconds = 5) and elapsedTime != 0 and not self.visible:
 				estimatedTime = datetime.fromtimestamp(float(self.limit / self.gameNo) * elapsedTime)
 				remaining = estimatedTime - datetime.now() + self.startTime
 				speed = round(self.gameNo / elapsedTime)
