@@ -2,6 +2,7 @@ from math import floor
 from random import choice
 from datetime import datetime, timedelta
 from traceback import print_exc
+import os
 
 DEV_MODE = False
 
@@ -20,24 +21,32 @@ class Gameplay:
 			if row is self.board[2]: print("\u2580"*23)
 	
 	def draw(self, position: int, symbol: str):
+		def alert(message: str):
+			system.clearTerminal()
+			if system.isTerminal: self.printBoard()
+			print(message)
+		
 		try:
 			int(position)
 		except ValueError:
 			if position == "dev":
 				global DEV_MODE
 				DEV_MODE = not DEV_MODE
-				print("Developer Mode:", DEV_MODE)
+				alert(f"Developer Mode: {DEV_MODE}")
 			elif DEV_MODE:
 				try:
 					if position == "": raise SyntaxError
 					
 					builtinAccess = {"print": print, "len": len, "str": str, "quit": quit, "True": True, "False": False}
 					globalAccess = {"ai": ai, "cells": ai.cells, "train": train, "autoplay": train.autoplay}
+
 					parse = compile(position, "<string>", "eval")
 					for keyword in parse.co_names:
 						if keyword not in builtinAccess and keyword not in globalAccess:
 							raise NameError(keyword)
 					
+					system.clearTerminal()
+					if "autoplay" not in position and system.isTerminal: self.printBoard()
 					result = eval(position, {"__builtins__": builtinAccess}, globalAccess)
 					if result is not None: print(result)
 				except NameError as keyword:
@@ -60,24 +69,23 @@ class Gameplay:
 						level += 1
 					
 					if str(keyword) in keywords:
-						print(f"Error: Access blocked to keyword '{keyword}'.")
+						alert(f"Error: Access blocked to keyword '{keyword}'.")
 					else:
-						print(f"Error: Keyword '{keyword}' does not exist.")
+						alert(f"Error: Keyword '{keyword}' does not exist.")
 				except SyntaxError:
-					if position == "": print("Error: No input given.")
-					else: print("Error: Invalid syntax.")
+					if position == "": alert("Error: No input given.")
+					else: alert("Error: Invalid syntax.")
 				except Exception as message:
-					print("Error:", message)
+					alert(f"Error: {message}")
 			else:
-				print("Error: Invalid input.")
+				alert("Error: Invalid input.")
 			
-			if not train.isRunning:
-				self.draw(input("Your move: "), symbol)
+			if not train.isRunning: self.draw(input("Your move: "), symbol)
 		else:
 			position = int(position)
 			
 			if position not in self.stats.options:
-				print("Error: Position unavailable.")
+				alert("Error: Position unavailable.")
 				self.draw(input("Your move: "), symbol)
 			else:
 				row = floor((position - 1) / 3)
@@ -153,7 +161,7 @@ class Computer:
 	def move(self):
 		if self.history not in self.cells.keys(): self.cells[self.history] = game.stats.options.copy()
 		selection = choice(self.cells[self.history])
-		if train.visible: print("Computer's move:", selection)
+		if train.visible and not system.isTerminal: print("Computer's move:", selection)
 		game.draw(selection, "O")
 	
 	class Training:
@@ -173,37 +181,63 @@ class Computer:
 			self.visible = showProgress if self.isRunning else True
 
 			elapsed = datetime.now() - self.startTime + datetime.strptime("0", "%S")
-			if not self.isRunning: print("Autoplay finished after", iterations, "games in", elapsed.strftime("%M:%S.%f")[:-4], "\n")
+			if not self.isRunning:
+				system.clearTerminal()
+				game.printBoard()
+				if game.stats.firstTurn == "computer": self.finishMessage = f"Autoplay finished after {iterations} games in {elapsed.strftime('%M:%S.%f')[:-4]}"
+				else: print(f"Autoplay finished after {iterations} games in {elapsed.strftime('%M:%S.%f')[:-4]}")
 		
 		def updateTimeInfo(self):
 			elapsedTime = (datetime.now() - self.startTime).total_seconds()
-			
-			if datetime.now() - self.timeSinceLastUpdate >= timedelta(seconds = 5) and elapsedTime != 0 and not self.visible:
+			delay = 1 if system.isTerminal else 5
+			if datetime.now() - self.timeSinceLastUpdate >= timedelta(seconds = delay) and elapsedTime != 0 and not self.visible:
+				system.clearTerminal()
 				estimatedTime = datetime.fromtimestamp(float(self.limit / self.gameNo) * elapsedTime)
 				remaining = estimatedTime - datetime.now() + self.startTime
 				speed = round(self.gameNo / elapsedTime)
 				print("Estimated Total Time:", estimatedTime.strftime("%M:%S.%f")[:-4])
 				print("Time Left:", remaining.strftime("%M:%S.%f")[:-4])
-				print("Speed:", speed, "games/s\n")
+				print("Speed:", speed, "games/s")
+				if not system.isTerminal: print()
 				self.timeSinceLastUpdate = datetime.now()
 
+class System:
+	def __init__(self):
+		try: size = os.get_terminal_size()
+		except: self.isTerminal = False
+		else:
+			self.isTerminal = True
+			self.terminalWidth = size.columns
+			self.terminalHeight = size.lines
+
+	def clearTerminal(self):
+		if self.isTerminal:
+			if os.name == "nt": _ = os.system("cls")
+			else: _ = os.system("clear")
+
+system = System()
 game = Gameplay()
 ai = Computer()
 train = ai.Training()
 
+game.printBoard()
+
 while True:
 	try:
 		if game.stats.playerTurn:
-			if train.visible: print("Options:", str(game.stats.options))
+			if train.visible and not system.isTerminal: print("Options:", str(game.stats.options))
 			playerMove = choice(game.stats.options) if train.isRunning else input("Your move: ")
 			game.draw(playerMove, "X")
-		else:
-			ai.move()
+		else: ai.move()
 		
 		if train.visible:
+			system.clearTerminal()
 			game.printBoard()
-			print()
-			if DEV_MODE: print("Past moves: ", ai.history)
+			try: print(train.finishMessage)
+			except AttributeError: pass
+			else: del train.finishMessage
+			finally:
+				if DEV_MODE: print("Past moves: ", ai.history)
 		
 		win = game.stats.playerTurn if game.check() else None
 		
@@ -217,14 +251,16 @@ while True:
 				game = Gameplay()
 				game.stats.changeFirstTurn(game.stats)
 				ai.history = ""
-				if train.visible: print("#"*50)
-				if train.isRunning: train.autoplay(train.limit, train.visible)
+				if not train.isRunning:
+					system.clearTerminal()
+					game.printBoard()
+				else: train.autoplay(train.limit, train.visible)
 				continue
-			else:
-				quit()
+			else: quit()
 		
 		game.stats.changeTurn(game.stats)
 	except Exception:
+		system.clearTerminal()
 		print_exc()
 		
 		if input("\nPrint backup data? (Yes/No) ").lower() == "yes":

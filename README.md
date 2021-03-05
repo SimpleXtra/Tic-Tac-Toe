@@ -14,12 +14,7 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe),
 > **Tic-tac-toe** is a paper-and-pencil game for two players, X and O, who take turns marking the spaces in a 3×3 grid. The player who succeeds in placing three of their marks in a diagonal, horizontal, or vertical row is the winner. It is a solved game with a forced draw assuming best play from both players.
 
 ### **Marking your spot**
-This game is using CLI. Every new game, the terminal will look something like this:
-```
-Options: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-Your move: 
-```
-Each numbers inside the brackets represents a vacant position in the board. The numbers change as you play the game. The distribution is:
+This game is using CLI. Each numbers inside the brackets represents a vacant position in the board. The numbers will update as you play the game. The distribution is:
 ```
 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ██▀▀▀▀▀██▀▀▀▀▀██▀▀▀▀▀██
@@ -33,7 +28,7 @@ Each numbers inside the brackets represents a vacant position in the board. The 
 ██▄▄▄▄▄██▄▄▄▄▄██▄▄▄▄▄██
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 ```
-Type the number location where you want to mark your symbol when prompted with `Your move: `. After that, the computer will automatically make his move. This goes on until either someone wins the game or the board is full and results in a draw.
+Type the number location where you want to mark your symbol when prompted with `Your move: `. For example, if you want to mark on the center, type `5`, then hit Enter. After that, the computer will automatically make his move. This goes on until either someone wins the game or the board is full and results in a draw.
 
 ### **Endgame**
 After the game ends, the terminal then displays the result (win/lose/draw) and the current score. For example:
